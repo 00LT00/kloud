@@ -1,22 +1,24 @@
 package main
 
 import (
-	"fmt"
+	"kloud/internal/rest"
+	"kloud/pkg/DB"
 	"kloud/pkg/casbin"
 	"kloud/pkg/conf"
-	"kloud/pkg/database"
 	"kloud/pkg/redis"
+	"log"
 	"time"
 )
 
 func main() {
-	fmt.Println("hello kloud")
+	log.Println("hello kloud")
 	conf.ShowAllConfig()
-	database.Ping()
+	DB.Ping()
 	e := casbin.GetEnforcer()
 	if e == nil {
-		fmt.Println("nil")
+		log.Println("nil")
 	}
 	redis.GetRedisClient().Set("kloud", time.Now().Format(time.RFC3339), 0)
-	fmt.Println(redis.GetRedisClient().Get("kloud").Time())
+	log.Println(redis.GetRedisClient().Get("kloud").Time())
+	panic(rest.Run(conf.GetConf().Service.Addr()))
 }

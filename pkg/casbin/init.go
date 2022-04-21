@@ -1,25 +1,58 @@
 package casbin
 
 import (
+	"errors"
 	"github.com/casbin/casbin/v2"
 	gormadapter "github.com/casbin/gorm-adapter/v3"
+	"kloud/pkg/DB"
 	"kloud/pkg/conf"
-	"kloud/pkg/database"
+	"log"
 )
 
-var e *casbin.SyncedEnforcer
+const (
+	Super       = "root"
+	Admin       = "admin"
+	Distribute  = "distribute"
+	Distributor = "distributor"
+	Importer    = "importer"
+	Import      = "import"
+	Any         = "*"
+)
+
+var e *enforcer
 
 func init() {
-	a, err := gormadapter.NewAdapterByDB(database.GetDB())
+	a, err := gormadapter.NewAdapterByDB(DB.GetDB())
 	if err != nil {
 		panic(err)
 	}
-	e, err = casbin.NewSyncedEnforcer(conf.GetConf().Casbin.Model(), a)
+	syncedEnforcer, err := casbin.NewSyncedEnforcer(conf.GetConf().Casbin.Model(), a)
 	if err != nil {
 		panic(err)
+	}
+	e = (*enforcer)(syncedEnforcer)
+	if len(e.GetPolicy()) < 3 {
+		ok, err := e.AddPolicies([][]string{
+			{Distribute, Any, Distribute},
+			{Importer, Any, Import},
+			{Super, Any, Any},
+		})
+		if !ok || err != nil {
+			if err != nil {
+				log.Println(err.Error())
+			}
+			panic(errors.New("add default policy error"))
+		}
+		ok, err = e.AddRolesForUser(Admin, []string{Importer, Distributor})
+		if !ok || err != nil {
+			if err != nil {
+				log.Println(err.Error())
+			}
+			panic(errors.New("add default policy error"))
+		}
 	}
 }
 
-func GetEnforcer() *casbin.SyncedEnforcer {
+func GetEnforcer() *enforcer {
 	return e
 }

@@ -1,11 +1,11 @@
-package database
+package DB
 
 import (
-	"fmt"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"kloud/model"
 	"kloud/pkg/conf"
+	"log"
 )
 
 var db = new(gorm.DB)
@@ -37,8 +37,8 @@ func Ping() {
 	sql, _ := db.DB()
 	err := sql.Ping()
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	} else {
-		fmt.Println("connect to DB")
+		log.Println("connect to DB")
 	}
 }
