@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	userLabel  = []string{"/repo", "/myapp"}
+	userLabel  = []string{"/repo", "/resource"}
 	adminLabel = []string{"/approval"}
 	superLabel = []string{"/super"}
 )

@@ -3,6 +3,7 @@ package rest
 import (
 	"context"
 	"encoding/gob"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"kloud/model"
@@ -14,13 +15,14 @@ import (
 	"time"
 )
 
-var r *gin.Engine
+var router *gin.Engine
 
 func init() {
 	gob.Register(model.User{})
-	r = gin.Default()
-	r.Use(sessionMiddleware())
-	r.GET("/incr", func(c *gin.Context) {
+	router = gin.Default()
+	router.Use(cors.Default())
+	router.Use(sessionMiddleware())
+	router.GET("/incr", func(c *gin.Context) {
 		session := sessions.Default(c)
 		var count int
 		v := session.Get("count")
@@ -35,7 +37,7 @@ func init() {
 		c.JSON(200, gin.H{"count": count})
 	})
 
-	r.GET("/ping", func(c *gin.Context) {
+	router.GET("/ping", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"message": "pong",
 		})
@@ -46,7 +48,7 @@ func init() {
 func Run(addr string) {
 	srv := &http.Server{
 		Addr:    addr,
-		Handler: r,
+		Handler: router,
 	}
 
 	// Initializing the server in a goroutine so that

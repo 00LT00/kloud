@@ -7,5 +7,5 @@ type casbinConf struct {
 }
 
 func (c casbinConf) Model() string {
-	return path.Join(pwd, c.ModelFile)
+	return path.Join(Pwd, c.ModelFile)
 }

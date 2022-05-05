@@ -10,13 +10,13 @@ import (
 )
 
 const (
-	Super       = "root"
-	Admin       = "admin"
-	Distribute  = "distribute"
-	Distributor = "distributor"
-	Importer    = "importer"
-	Import      = "import"
-	Any         = "*"
+	Super    = "root"
+	Admin    = "admin"
+	Approve  = "distribute"
+	Approver = "distributor"
+	Importer = "importer"
+	Import   = "import"
+	Any      = "*"
 )
 
 var e *enforcer
@@ -33,7 +33,7 @@ func init() {
 	e = (*enforcer)(syncedEnforcer)
 	if len(e.GetPolicy()) < 3 {
 		ok, err := e.AddPolicies([][]string{
-			{Distribute, Any, Distribute},
+			{Approver, Any, Approve},
 			{Importer, Any, Import},
 			{Super, Any, Any},
 		})
@@ -43,7 +43,7 @@ func init() {
 			}
 			panic(errors.New("add default policy error"))
 		}
-		ok, err = e.AddRolesForUser(Admin, []string{Importer, Distributor})
+		ok, err = e.AddRolesForUser(Admin, []string{Importer, Approver})
 		if !ok || err != nil {
 			if err != nil {
 				log.Println(err.Error())

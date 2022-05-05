@@ -29,6 +29,22 @@ func getUser(c *gin.Context) model.User {
 	return v.(model.User)
 }
 
+var checkLogin = func(c *gin.Context) {
+	session := sessions.Default(c)
+	v := session.Get("user")
+	if v == nil {
+		c.AbortWithStatusJSON(util.MakeResp(http.StatusUnauthorized, 0, "unauthorized"))
+		return
+	}
+	c.Set("user", v)
+	v = session.Get("label")
+	if v == nil {
+		c.AbortWithStatusJSON(util.MakeResp(http.StatusUnauthorized, 0, "unauthorized"))
+		return
+	}
+	c.Set("label", v)
+}
+
 func checkOp(obj, act string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		u := getUser(c)

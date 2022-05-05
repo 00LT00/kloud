@@ -7,9 +7,9 @@ import (
 
 type Resource struct {
 	//自动生成
-	ResourceID string `gorm:"primaryKey"`
-	Name       string
-	Folder     string
+	ResourceID string `json:"resource_id" gorm:"primaryKey"`
+	Name       string `json:"name"`
+	Folder     string `json:"folder"`
 }
 
 func (r *Resource) BeforeCreate(_ *gorm.DB) (err error) {

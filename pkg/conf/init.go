@@ -21,15 +21,15 @@ type config struct {
 }
 
 var c = new(config)
-var pwd string
+var Pwd string
 
 func init() {
 	var err error
-	pwd, err = os.Getwd()
+	Pwd, err = os.Getwd()
 	if err != nil {
 		panic(err)
 	}
-	_, err = toml.DecodeFile(path.Join(pwd, "config", "kloud.toml"), c)
+	_, err = toml.DecodeFile(path.Join(Pwd, "config", "kloud.toml"), c)
 	if err != nil {
 		panic(err)
 	}
