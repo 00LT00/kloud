@@ -8,7 +8,22 @@ import (
 type enforcer casbin.SyncedEnforcer
 
 func (e *enforcer) AddAdmin(id string) bool {
-	ok, err := e.AddRoleForUser(id, Admin)
+	ok, err := e.HasRoleForUser(id, Admin)
+	if err != nil {
+		log.Println(err.Error())
+	}
+	if ok {
+		return ok
+	}
+	ok, err = e.AddRoleForUser(id, Admin)
+	if err != nil {
+		log.Println(err.Error())
+	}
+	return ok
+}
+
+func (e *enforcer) DeleteAdmin(id string) bool {
+	ok, err := e.DeleteRoleForUser(id, Admin)
 	if err != nil {
 		log.Println(err.Error())
 	}

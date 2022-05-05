@@ -18,7 +18,8 @@ func main() {
 	if e == nil {
 		log.Println("nil")
 	}
+	log.Println(e.GetPolicy())
 	redis.GetRedisClient().Set("kloud", time.Now().Format(time.RFC3339), 0)
 	log.Println(redis.GetRedisClient().Get("kloud").Time())
-	panic(rest.Run(conf.GetConf().Service.Addr()))
+	rest.Run(conf.GetConf().Service.Addr())
 }

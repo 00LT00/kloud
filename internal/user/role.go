@@ -2,36 +2,45 @@ package user
 
 import (
 	"github.com/gin-gonic/gin"
-	"kloud/model"
-	"kloud/pkg/DB"
 	"kloud/pkg/casbin"
 	"kloud/pkg/util"
 	"net/http"
 )
 
-type restUsers struct {
-	Users []string `json:"users"`
-}
-
 func RestAddAdmin(c *gin.Context) {
-	req := new(restUsers)
-	if err := c.ShouldBindJSON(req); err != nil {
-		c.JSON(util.MakeResp(http.StatusBadRequest, 1, err.Error()))
+	id := c.Param("id")
+	if id == "" {
+		c.JSON(util.MakeResp(http.StatusBadRequest, 0, "id none"))
 		return
 	}
-	db := DB.GetDB()
 	e := casbin.GetEnforcer()
-	successes := make([]string, 0)
-	for _, id := range req.Users {
-		u := new(model.User)
-		u.ID = id
-		var cnt int64
-		db.Model(&model.User{}).Where(u).Count(&cnt)
-		if cnt > 0 {
-			if e.AddAdmin(id) {
-				successes = append(successes, id)
-			}
-		}
+	if !isExist(id) {
+		c.JSON(util.MakeResp(http.StatusNotFound, 0, "user none"))
 	}
-	c.JSON(util.MakeOkResp(successes))
+	if !e.AddAdmin(id) {
+		c.JSON(util.MakeResp(http.StatusInternalServerError, 0, "add admin role error"))
+	}
+	c.JSON(util.MakeOkResp("success"))
+}
+
+func RestDeleteAdmin(c *gin.Context) {
+	id := c.Param("id")
+	if id == "" {
+		c.JSON(util.MakeResp(http.StatusBadRequest, 0, "id none"))
+		return
+	}
+	e := casbin.GetEnforcer()
+	if !isExist(id) {
+		c.JSON(util.MakeResp(http.StatusNotFound, 0, "user none"))
+	}
+	if !e.DeleteAdmin(id) {
+		c.JSON(util.MakeResp(http.StatusInternalServerError, 0, "delete admin role error"))
+	}
+	c.JSON(util.MakeOkResp("success"))
+}
+
+func RestGetAdmin(c *gin.Context) {
+	e := casbin.GetEnforcer()
+	ids := e.GetAdminUsers()
+	c.JSON(util.MakeOkResp(ids))
 }

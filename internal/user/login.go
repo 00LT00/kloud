@@ -50,6 +50,22 @@ func RestLogin(c *gin.Context) {
 	u.Pass = ""
 	s := sessions.Default(c)
 	s.Set("user", u)
+	label := getLabel(u.ID)
+	s.Set("label", label)
 	_ = s.Save()
-	c.JSON(http.StatusOK, u)
+	c.JSON(http.StatusOK, struct {
+		User  *model.User
+		Label []string
+	}{
+		User:  u,
+		Label: label,
+	})
+}
+
+func RestLogout(c *gin.Context) {
+	s := sessions.Default(c)
+	s.Delete("user")
+	s.Delete("label")
+	_ = s.Save()
+	c.JSON(util.MakeOkResp("success logout"))
 }

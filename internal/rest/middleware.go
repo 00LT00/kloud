@@ -12,7 +12,7 @@ import (
 	"net/http"
 )
 
-func sessionMiddleWare() gin.HandlerFunc {
+func sessionMiddleware() gin.HandlerFunc {
 	c := conf.GetConf()
 	store, err := redis.NewStore(10, "tcp", c.Redis.Addr(), c.Redis.Pass, []byte(c.Service.Secret))
 	store.Options(sessions.Options{
@@ -24,11 +24,14 @@ func sessionMiddleWare() gin.HandlerFunc {
 	}
 	return sessions.Sessions("sessions", store)
 }
+func getUser(c *gin.Context) model.User {
+	v, _ := c.Get("user")
+	return v.(model.User)
+}
 
-func check(obj, act string) gin.HandlerFunc {
+func checkOp(obj, act string) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		v, _ := c.Get("user")
-		u := v.(model.User)
+		u := getUser(c)
 		e := casbin.GetEnforcer()
 		ok, err := e.Enforce(u.ID, obj, act)
 		if !ok || err != nil {
@@ -38,5 +41,20 @@ func check(obj, act string) gin.HandlerFunc {
 			c.AbortWithStatusJSON(util.MakeResp(http.StatusForbidden, 0, "forbidden"))
 			return
 		}
+	}
+}
+
+func checkRole(roles ...string) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		u := getUser(c)
+		e := casbin.GetEnforcer()
+		for _, r := range roles {
+			ok, _ := e.HasRoleForUser(u.ID, r)
+			if ok {
+				return
+			}
+		}
+		c.AbortWithStatusJSON(util.MakeResp(http.StatusForbidden, 0, "forbidden"))
+		return
 	}
 }

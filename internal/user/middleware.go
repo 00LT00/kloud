@@ -7,7 +7,7 @@ import (
 	"net/http"
 )
 
-func InfoMiddleware() gin.HandlerFunc {
+func LoadInfoMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		session := sessions.Default(c)
 		v := session.Get("user")
@@ -16,5 +16,11 @@ func InfoMiddleware() gin.HandlerFunc {
 			return
 		}
 		c.Set("user", v)
+		v = session.Get("label")
+		if v == nil {
+			c.AbortWithStatusJSON(util.MakeResp(http.StatusUnauthorized, 0, "unauthorized"))
+			return
+		}
+		c.Set("label", v)
 	}
 }
