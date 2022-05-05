@@ -9,12 +9,6 @@ import (
 	"kloud/pkg/util"
 	"log"
 	"net/http"
-	"regexp"
-)
-
-const (
-	emailPattern = "^([a-z0-9_.-]+)@([\\da-z.-]+)\\.([a-z.]+)$"
-	phonePattern = "1[34578][012356789]\\d{8}|134[012345678]\\d{7}"
 )
 
 func RestLogin(c *gin.Context) {
@@ -26,13 +20,7 @@ func RestLogin(c *gin.Context) {
 		return
 	}
 	u := new(model.User)
-	if ok, _ := regexp.MatchString(emailPattern, username); ok {
-		u.Email = username
-	} else if ok, _ := regexp.MatchString(phonePattern, username); ok {
-		u.Phone = username
-	} else {
-		u.Name = username
-	}
+	u.Name = username
 	err := db.Where(u).First(u).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {

@@ -8,9 +8,9 @@ import (
 
 type User struct {
 	ID    string `json:"id" gorm:"primaryKey"`
-	Name  string `json:"username" gorm:"uniqueIndex,size:20"`
-	Phone string `json:"phone" gorm:"uniqueIndex,size:20"`
-	Email string `json:"email" gorm:"uniqueIndex,size:20"`
+	Name  string `json:"username" gorm:"uniqueIndex;size:40"`
+	Phone string `json:"phone"`
+	Email string `json:"email"`
 	Pass  string `json:"password,omitempty"`
 }
 
