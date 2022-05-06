@@ -20,7 +20,7 @@ func RestGetInfo(c *gin.Context) {
 		c.AbortWithStatusJSON(util.MakeResp(http.StatusNotFound, 1, err.Error()))
 		return
 	}
-	c.JSON(util.MakeOkResp(*user))
+	c.JSON(util.MakeOkResp(user))
 }
 
 func getInfo(userID string) (*model.User, error) {

@@ -5,11 +5,17 @@ import (
 	"gorm.io/gorm"
 )
 
+const (
+	K8s  = "k8s"
+	Helm = "helm"
+)
+
 type Resource struct {
 	//自动生成
 	ResourceID string `json:"resource_id" gorm:"primaryKey"`
 	Name       string `json:"name"`
 	Folder     string `json:"folder"`
+	Type       string `json:"type"`
 }
 
 func (r *Resource) BeforeCreate(_ *gorm.DB) (err error) {

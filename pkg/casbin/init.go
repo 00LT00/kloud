@@ -12,8 +12,8 @@ import (
 const (
 	Super    = "root"
 	Admin    = "admin"
-	Approve  = "distribute"
-	Approver = "distributor"
+	Approve  = "approve"
+	Approver = "approver"
 	Importer = "importer"
 	Import   = "import"
 	Any      = "*"

@@ -22,7 +22,7 @@ func RestDelete(c *gin.Context) {
 
 func deleteResource(id string) error {
 	db := DB.GetDB()
-	err := db.Delete(&model.Resource{}, id).Error
+	err := db.Delete(&model.Resource{ResourceID: id}).Error
 	if err != nil {
 		log.Println(err.Error())
 	}

@@ -8,7 +8,7 @@ import (
 	"kloud/pkg/util"
 	"log"
 	"net/http"
-	"path"
+	"path/filepath"
 )
 
 func RestUpdate(c *gin.Context) {
@@ -33,7 +33,7 @@ func RestUpdate(c *gin.Context) {
 }
 
 func updateResource(r *model.Resource) error {
-	if !path.IsAbs(r.Folder) {
+	if !filepath.IsAbs(r.Folder) {
 		return errors.New("is not absolute")
 	}
 	ok, _ := util.PathExists(r.Folder)
@@ -41,7 +41,7 @@ func updateResource(r *model.Resource) error {
 		return errors.New("folder not exist")
 	}
 	db := DB.GetDB()
-	err := db.Save(r).Error
+	err := db.Where(&model.Resource{ResourceID: r.ResourceID}).Save(r).Error
 	if err != nil {
 		log.Println(err.Error())
 	}

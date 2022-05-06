@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"kloud/internal/app"
 	"kloud/internal/flow"
 	"kloud/internal/resource"
 	"kloud/internal/user"
@@ -21,8 +22,9 @@ func initRouter() {
 		// 获取基本信息
 		u.GET("/info", user.RestGetInfo)
 		// 管理员权限的增删
-		a := u.Group("/admin", checkRole(casbin.Super))
 		{
+			u.GET("/all", checkRole(casbin.Super), user.RestGetAllUser)
+			a := u.Group("/admin", checkRole(casbin.Super))
 			a.GET("", user.RestGetAdmin)
 			a.DELETE("/:id", user.RestDeleteAdmin)
 			a.PATCH("/:id", user.RestAddAdmin)
@@ -49,14 +51,23 @@ func initRouter() {
 		//创建审批流
 		f.POST("", flow.RestCreate)
 		//获取审批详情
-		f.GET("/all/:id", flow.RestGet)
+		f.GET("", flow.RestGet)
 		//用户自己的审批
 		f.GET("/user", flow.RestGetByUser)
 
 		//获取待审批的资源
 		f.GET("/pending", checkOp("flow", casbin.Approve), flow.RestGetPending)
 		//审批某个flow
-		f.PUT("/id", checkOp("flow", casbin.Approve), flow.RestApprove)
+		f.PUT("/:id", checkOp("flow", casbin.Approve), flow.RestApprove)
+	}
+
+	// 个人应用
+	{
+		a := router.Group("/app")
+		//超级管理员可以看到所有的
+		a.GET("", checkRole(casbin.Super), app.RestGetAll)
+		//用户自己的app
+		a.GET("/user", app.RestGetByUser)
 	}
 
 }

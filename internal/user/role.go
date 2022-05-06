@@ -2,6 +2,8 @@ package user
 
 import (
 	"github.com/gin-gonic/gin"
+	"kloud/model"
+	"kloud/pkg/DB"
 	"kloud/pkg/casbin"
 	"kloud/pkg/util"
 	"net/http"
@@ -42,5 +44,15 @@ func RestDeleteAdmin(c *gin.Context) {
 func RestGetAdmin(c *gin.Context) {
 	e := casbin.GetEnforcer()
 	ids := e.GetAdminUsers()
-	c.JSON(util.MakeOkResp(ids))
+	db := DB.GetDB()
+	users := make([]*model.User, 0, len(ids))
+	for _, id := range ids {
+		user := new(model.User)
+		db.Where(&model.User{ID: id}).First(user)
+		if user != nil {
+			user.Pass = ""
+		}
+		users = append(users, user)
+	}
+	c.JSON(util.MakeOkResp(users))
 }

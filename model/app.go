@@ -6,11 +6,11 @@ import (
 )
 
 type App struct {
-	gorm.Model
-	AppID      string `gorm:"uniqueIndex;size:40"`
+	AppID      string `gorm:"primaryKey"`
+	UserID     string
 	ResourceID string
 	Name       string
-	Remarks    string
+	Config     string
 }
 
 func (a *App) BeforeCreate(_ *gorm.DB) (err error) {

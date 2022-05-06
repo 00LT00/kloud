@@ -14,7 +14,7 @@ func RestGetAll(c *gin.Context) {
 	db := DB.GetDB()
 	var rs []*model.Resource
 	err := db.Find(&rs).Error
-	if err != nil {
+	if err != nil && err != gorm.ErrRecordNotFound {
 		c.JSON(util.MakeResp(http.StatusInternalServerError, 1, err.Error()))
 		return
 	}

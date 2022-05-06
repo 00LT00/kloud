@@ -8,7 +8,7 @@ import (
 	"kloud/pkg/util"
 	"log"
 	"net/http"
-	"path"
+	"path/filepath"
 )
 
 func RestCreate(c *gin.Context) {
@@ -18,8 +18,8 @@ func RestCreate(c *gin.Context) {
 		c.JSON(util.MakeResp(http.StatusBadRequest, 1, err.Error()))
 		return
 	}
-	if r.Name == "" || r.Folder == "" {
-		c.JSON(util.MakeResp(http.StatusBadRequest, 0, "name or folder null"))
+	if r.Name == "" || r.Folder == "" || (r.Type != model.K8s && r.Type != model.Helm) {
+		c.JSON(util.MakeResp(http.StatusBadRequest, 0, "name or folder null or type error"))
 		return
 	}
 	err = createResource(r)
@@ -31,7 +31,7 @@ func RestCreate(c *gin.Context) {
 }
 
 func createResource(r *model.Resource) error {
-	if !path.IsAbs(r.Folder) {
+	if !filepath.IsAbs(r.Folder) {
 		return errors.New("is not absolute")
 	}
 	ok, _ := util.PathExists(r.Folder)

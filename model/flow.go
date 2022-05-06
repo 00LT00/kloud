@@ -1,6 +1,9 @@
 package model
 
-import "gorm.io/gorm"
+import (
+	"github.com/gofrs/uuid"
+	"gorm.io/gorm"
+)
 
 const (
 	Pass    = "pass"
@@ -9,7 +12,7 @@ const (
 )
 
 type Flow struct {
-	gorm.Model
+	FlowID string `gorm:"primaryKey"`
 	//申请人
 	ApplicantID string
 	//申请的资源
@@ -18,11 +21,17 @@ type Flow struct {
 	Statue string
 	//审批人
 	ApproverID string
-	//申请的AppID
+	//申请的App的ID
 	AppID string
+	// 配置
+	Config string
+	// 原因
+	Reason string
 }
 
 func (f *Flow) BeforeCreate(_ *gorm.DB) (err error) {
 	f.Statue = Pending
+	v4, _ := uuid.NewV4()
+	f.FlowID = v4.String()
 	return
 }
