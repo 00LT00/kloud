@@ -10,15 +10,19 @@ import (
 )
 
 func RestCreate(c *gin.Context) {
-	id := c.PostForm("resource_id")
-	config := c.PostForm("config")
-	if id == "" {
+	type req struct {
+		ResourceID string `json:"resource_id"`
+		Config     string `json:"config"`
+	}
+	r := new(req)
+
+	if r.ResourceID == "" {
 		c.JSON(util.MakeResp(http.StatusBadRequest, 0, "resource_id null"))
 		return
 	}
 	v, _ := c.Get("user")
 	u := v.(model.User)
-	err := createFlow(u.ID, id, config)
+	err := createFlow(u.ID, r.ResourceID, r.Config)
 	if err != nil {
 		c.JSON(util.MakeResp(http.StatusBadRequest, 1, err.Error()))
 		return

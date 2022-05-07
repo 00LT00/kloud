@@ -13,8 +13,13 @@ import (
 
 func RestLogin(c *gin.Context) {
 	db := DB.GetDB()
-	username := c.PostForm("username")
-	password := c.PostForm("password")
+	type req struct {
+		Username, Password string
+	}
+	r := new(req)
+	_ = c.ShouldBindJSON(r)
+	username := r.Username
+	password := r.Password
 	if username == "" || password == "" {
 		c.JSON(util.MakeResp(http.StatusBadRequest, 0, "username or password null"))
 		return
