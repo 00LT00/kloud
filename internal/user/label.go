@@ -1,13 +1,14 @@
 package user
 
 import (
-	"github.com/gin-gonic/gin"
 	"kloud/pkg/casbin"
 	"kloud/pkg/util"
+
+	"github.com/gin-gonic/gin"
 )
 
 var (
-	userLabel  = []string{"/repo", "/resource", "/app"}
+	userLabel  = []string{"/resource", "/app"}
 	adminLabel = []string{"/approval"}
 	superLabel = []string{"/super"}
 )

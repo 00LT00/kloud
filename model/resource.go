@@ -3,6 +3,7 @@ package model
 import (
 	"github.com/gofrs/uuid"
 	"gorm.io/gorm"
+	"time"
 )
 
 const (
@@ -13,9 +14,14 @@ const (
 type Resource struct {
 	//自动生成
 	ResourceID string `json:"resource_id" gorm:"primaryKey"`
-	Name       string `json:"name"`
-	Folder     string `json:"folder"`
-	Type       string `json:"type"`
+	Name       string `json:"name" gorm:"not null"`
+	Folder     string `json:"folder" gorm:"not null"`
+	Type       string `json:"type" gorm:"not null"`
+	MaxNum     int    `json:"max_num" gorm:"not null"`
+	// 创建时间
+	CreatedAt time.Time
+	// 更新时间
+	UpdatedAt time.Time
 }
 
 func (r *Resource) BeforeCreate(_ *gorm.DB) (err error) {

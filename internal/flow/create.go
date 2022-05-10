@@ -15,14 +15,17 @@ func RestCreate(c *gin.Context) {
 		Config     string `json:"config"`
 	}
 	r := new(req)
-
+	err := c.ShouldBindJSON(r)
+	if err != nil {
+		log.Println(err.Error())
+	}
 	if r.ResourceID == "" {
 		c.JSON(util.MakeResp(http.StatusBadRequest, 0, "resource_id null"))
 		return
 	}
 	v, _ := c.Get("user")
 	u := v.(model.User)
-	err := createFlow(u.ID, r.ResourceID, r.Config)
+	err = createFlow(u.ID, r.ResourceID, r.Config)
 	if err != nil {
 		c.JSON(util.MakeResp(http.StatusBadRequest, 1, err.Error()))
 		return
