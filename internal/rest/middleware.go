@@ -1,15 +1,16 @@
 package rest
 
 import (
-	"github.com/gin-contrib/sessions"
-	"github.com/gin-contrib/sessions/redis"
-	"github.com/gin-gonic/gin"
 	"kloud/model"
 	"kloud/pkg/casbin"
 	"kloud/pkg/conf"
 	"kloud/pkg/util"
 	"log"
 	"net/http"
+
+	"github.com/gin-contrib/sessions"
+	"github.com/gin-contrib/sessions/redis"
+	"github.com/gin-gonic/gin"
 )
 
 func sessionMiddleware() gin.HandlerFunc {
@@ -18,6 +19,7 @@ func sessionMiddleware() gin.HandlerFunc {
 	store.Options(sessions.Options{
 		MaxAge:   60 * 60 * 24,
 		HttpOnly: true,
+		SameSite: http.SameSiteNoneMode,
 	})
 	if err != nil {
 		panic(err)
