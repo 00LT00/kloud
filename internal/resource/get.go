@@ -36,5 +36,11 @@ func RestGet(c *gin.Context) {
 		c.JSON(util.MakeResp(http.StatusInternalServerError, 0, "unknown error"))
 		return
 	}
-	c.JSON(util.MakeOkResp(r))
+	c.JSON(util.MakeOkResp(struct {
+		model.Resource
+		Config string `json:"config"`
+	}{
+		*r,
+		`{"name":"demo","cpu":"20","memory": "10"}`,
+	}))
 }
