@@ -1,50 +1,37 @@
 package rest
 
 import (
+	"encoding/json"
 	"kloud/model"
 	"kloud/pkg/casbin"
-	"kloud/pkg/conf"
+	"kloud/pkg/redis"
 	"kloud/pkg/util"
 	"log"
 	"net/http"
 
-	"github.com/gin-contrib/sessions"
-	"github.com/gin-contrib/sessions/redis"
 	"github.com/gin-gonic/gin"
 )
 
-func sessionMiddleware() gin.HandlerFunc {
-	c := conf.GetConf()
-	store, err := redis.NewStore(10, "tcp", c.Redis.Addr(), c.Redis.Pass, []byte(c.Service.Secret))
-	store.Options(sessions.Options{
-		MaxAge:   60 * 60 * 24,
-		HttpOnly: true,
-		SameSite: http.SameSiteNoneMode,
-	})
-	if err != nil {
-		panic(err)
-	}
-	return sessions.Sessions("sessions", store)
-}
 func getUser(c *gin.Context) model.User {
 	v, _ := c.Get("user")
 	return v.(model.User)
 }
 
 var checkLogin = func(c *gin.Context) {
-	session := sessions.Default(c)
-	v := session.Get("user")
+	token := c.GetHeader("Authorization")
+	redisClient := redis.GetRedisClient()
+	uStr, _ := redisClient.Get(token).Result()
+	if uStr == "" {
+		c.AbortWithStatusJSON(util.MakeResp(http.StatusUnauthorized, 0, "unauthorized"))
+		return
+	}
+	v := new(model.User)
+	_ = json.Unmarshal([]byte(uStr), v)
 	if v == nil {
 		c.AbortWithStatusJSON(util.MakeResp(http.StatusUnauthorized, 0, "unauthorized"))
 		return
 	}
 	c.Set("user", v)
-	v = session.Get("label")
-	if v == nil {
-		c.AbortWithStatusJSON(util.MakeResp(http.StatusUnauthorized, 0, "unauthorized"))
-		return
-	}
-	c.Set("label", v)
 }
 
 func checkOp(obj, act string) gin.HandlerFunc {

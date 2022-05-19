@@ -1,14 +1,18 @@
 package user
 
 import (
+	"encoding/json"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
+	"github.com/gofrs/uuid"
 	"gorm.io/gorm"
 	"kloud/model"
 	"kloud/pkg/DB"
+	"kloud/pkg/redis"
 	"kloud/pkg/util"
 	"log"
 	"net/http"
+	"time"
 )
 
 func RestLogin(c *gin.Context) {
@@ -41,17 +45,24 @@ func RestLogin(c *gin.Context) {
 		return
 	}
 	u.Pass = ""
-	s := sessions.Default(c)
-	s.Set("user", u)
-	label := getLabel(u.ID)
-	s.Set("label", label)
-	_ = s.Save()
+	uid, _ := uuid.NewV4()
+	token := uid.String()
+	uJson, _ := json.Marshal(u)
+	client := redis.GetRedisClient()
+	err = client.Set(token, string(uJson), 24*time.Hour).Err()
+	if err != nil {
+		log.Println(err)
+		c.JSON(util.MakeResp(http.StatusInternalServerError, 0, "unknown error"))
+		return
+	}
+	role := getRole(u.ID)
+
 	c.JSON(http.StatusOK, struct {
-		User  *model.User
-		Label []string
+		Token string
+		Role  string
 	}{
-		User:  u,
-		Label: label,
+		Token: token,
+		Role:  role,
 	})
 }
 

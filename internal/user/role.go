@@ -56,3 +56,14 @@ func RestGetAdmin(c *gin.Context) {
 	}
 	c.JSON(util.MakeOkResp(users))
 }
+
+func getRole(id string) string {
+	e := casbin.GetEnforcer()
+	if ok, _ := e.HasRoleForUser(id, casbin.Super); ok {
+		return casbin.Super
+	}
+	if ok, _ := e.HasRoleForUser(id, casbin.Admin); ok {
+		return casbin.Admin
+	}
+	return casbin.User
+}

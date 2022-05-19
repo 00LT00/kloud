@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/gob"
 	"github.com/gin-contrib/cors"
-	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"kloud/model"
 	"log"
@@ -21,21 +20,6 @@ func init() {
 	gob.Register(model.User{})
 	router = gin.Default()
 	router.Use(cors.Default())
-	router.Use(sessionMiddleware())
-	router.GET("/incr", func(c *gin.Context) {
-		session := sessions.Default(c)
-		var count int
-		v := session.Get("count")
-		if v == nil {
-			count = 0
-		} else {
-			count = v.(int)
-			count++
-		}
-		session.Set("count", count)
-		_ = session.Save()
-		c.JSON(200, gin.H{"count": count})
-	})
 
 	router.GET("/ping", func(c *gin.Context) {
 		c.JSON(200, gin.H{

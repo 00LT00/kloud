@@ -12,6 +12,7 @@ import (
 const (
 	Super    = "root"
 	Admin    = "admin"
+	User     = "user"
 	Approve  = "approve"
 	Approver = "approver"
 	Importer = "importer"
