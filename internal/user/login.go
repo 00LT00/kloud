@@ -56,7 +56,6 @@ func RestLogin(c *gin.Context) {
 		return
 	}
 	role := getRole(u.ID)
-
 	c.JSON(http.StatusOK, struct {
 		Token string
 		Role  string

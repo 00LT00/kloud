@@ -3,6 +3,7 @@ package app
 import (
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
+	"kloud/internal/app/port"
 	"kloud/model"
 	"kloud/pkg/DB"
 	"kloud/pkg/util"
@@ -25,7 +26,7 @@ func RestGetByUser(c *gin.Context) {
 }
 
 func RestGet(c *gin.Context) {
-	id := c.Query("id")
+	id := c.Param("id")
 	db := DB.GetDB()
 	var app model.App
 	err := db.Where(&model.App{AppID: id}).First(&app).Error
@@ -38,7 +39,14 @@ func RestGet(c *gin.Context) {
 		c.JSON(util.MakeResp(http.StatusInternalServerError, 0, "unknown error"))
 		return
 	}
-	c.JSON(util.MakeOkResp(app))
+	ports := port.GetPortMapping(app.AppID)
+	c.JSON(util.MakeOkResp(struct {
+		App   model.App
+		Ports []model.PortMapping `json:"ports"`
+	}{
+		app,
+		ports,
+	}))
 }
 
 func RestGetAll(c *gin.Context) {

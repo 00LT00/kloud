@@ -2,6 +2,7 @@ package rest
 
 import (
 	"kloud/internal/app"
+	"kloud/internal/app/port"
 	"kloud/internal/flow"
 	"kloud/internal/resource"
 	"kloud/internal/user"
@@ -68,6 +69,10 @@ func initRouter() {
 		a.GET("", checkRole(casbin.Super), app.RestGetAll)
 		//用户自己的app
 		a.GET("/user", app.RestGetByUser)
+		// 查看app详情
+		a.GET("/:id", app.RestGet)
+		p := a.Group("/port")
+		p.PUT("", port.RestCreatePortMapping)
 	}
 
 }

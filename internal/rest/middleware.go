@@ -17,6 +17,17 @@ func getUser(c *gin.Context) model.User {
 	return v.(model.User)
 }
 
+func getRole(id string) string {
+	e := casbin.GetEnforcer()
+	if ok, _ := e.HasRoleForUser(id, casbin.Super); ok {
+		return casbin.Super
+	}
+	if ok, _ := e.HasRoleForUser(id, casbin.Admin); ok {
+		return casbin.Admin
+	}
+	return casbin.User
+}
+
 var checkLogin = func(c *gin.Context) {
 	token := c.GetHeader("Authorization")
 	redisClient := redis.GetRedisClient()
@@ -32,6 +43,7 @@ var checkLogin = func(c *gin.Context) {
 		return
 	}
 	c.Set("user", *v)
+	c.Set("role", getRole(v.ID))
 }
 
 func checkOp(obj, act string) gin.HandlerFunc {

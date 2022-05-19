@@ -13,7 +13,13 @@ func RestGetInfo(c *gin.Context) {
 	role, _ := c.Get("role")
 	id := c.Query("id")
 	if id == "" || u.(model.User).ID == id {
-		c.JSON(util.MakeOkResp(u.(model.User)))
+		c.JSON(util.MakeOkResp(struct {
+			model.User
+			Role string `json:"role"`
+		}{
+			u.(model.User),
+			role.(string),
+		}))
 		return
 	}
 	user, err := getInfo(id)
@@ -21,13 +27,7 @@ func RestGetInfo(c *gin.Context) {
 		c.AbortWithStatusJSON(util.MakeResp(http.StatusNotFound, 1, err.Error()))
 		return
 	}
-	c.JSON(util.MakeOkResp(struct {
-		model.User
-		Role string `json:"role"`
-	}{
-		*user,
-		role.(string),
-	}))
+	c.JSON(util.MakeOkResp(*user))
 }
 
 func getInfo(userID string) (*model.User, error) {
