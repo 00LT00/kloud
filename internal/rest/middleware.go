@@ -31,7 +31,7 @@ var checkLogin = func(c *gin.Context) {
 		c.AbortWithStatusJSON(util.MakeResp(http.StatusUnauthorized, 0, "unauthorized"))
 		return
 	}
-	c.Set("user", v)
+	c.Set("user", *v)
 }
 
 func checkOp(obj, act string) gin.HandlerFunc {
