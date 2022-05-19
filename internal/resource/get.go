@@ -38,9 +38,13 @@ func RestGet(c *gin.Context) {
 	}
 	c.JSON(util.MakeOkResp(struct {
 		model.Resource
-		Config string `json:"config"`
+		Config interface{} `json:"config"`
 	}{
 		*r,
-		`{"name":"demo","cpu":"20","memory": "10"}`,
+		gin.H{
+			"name":   "demo",
+			"cpu":    "20",
+			"memory": "10",
+		},
 	}))
 }
