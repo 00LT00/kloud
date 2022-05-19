@@ -16,6 +16,14 @@ func GetPortMapping(id string) []model.PortMapping {
 }
 
 func RestCreatePortMapping(c *gin.Context) {
+	id := c.Param("id")
+	db := DB.GetDB()
+	var cnt int64
+	db.Model(&model.App{}).Where(&model.App{AppID: id}).Count(&cnt)
+	if cnt == 0 {
+		c.JSON(util.MakeResp(http.StatusNotFound, 0, "app none"))
+		return
+	}
 	var req struct {
 		Port, TargetPort int
 	}
@@ -26,12 +34,23 @@ func RestCreatePortMapping(c *gin.Context) {
 	ports := &model.PortMapping{
 		Port:       req.Port,
 		TargetPort: req.TargetPort,
+		AppID:      id,
 	}
-	db := DB.GetDB()
+
 	err := db.Create(&ports).Error
 	if err != nil {
 		c.JSON(util.MakeResp(http.StatusInternalServerError, 1, err.Error()))
 		return
 	}
 	c.JSON(util.MakeOkResp("create mapping success"))
+}
+
+func RestGetPortMapping(c *gin.Context) {
+	id := c.Param("id")
+	ports := GetPortMapping(id)
+	m := make(map[int]int)
+	for _, port := range ports {
+		m[port.Port] = port.TargetPort
+	}
+	c.JSON(util.MakeOkResp(m))
 }

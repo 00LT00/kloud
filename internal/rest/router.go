@@ -71,8 +71,9 @@ func initRouter() {
 		a.GET("/user", app.RestGetByUser)
 		// 查看app详情
 		a.GET("/:id", app.RestGet)
-		p := a.Group("/port")
+		p := a.Group("/:id/port")
 		p.PUT("", port.RestCreatePortMapping)
+		p.GET("", port.RestGetPortMapping)
 	}
 
 }
