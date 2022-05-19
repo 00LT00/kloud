@@ -23,6 +23,7 @@ func init() {
 		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "HEAD"},
 		AllowHeaders:     []string{"Origin", "Content-Length", "Content-Type", "Authorization"},
 		AllowCredentials: false,
+		AllowAllOrigins:  true,
 		MaxAge:           12 * time.Hour,
 	}))
 
