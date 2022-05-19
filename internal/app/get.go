@@ -24,6 +24,23 @@ func RestGetByUser(c *gin.Context) {
 	c.JSON(util.MakeOkResp(apps))
 }
 
+func RestGet(c *gin.Context) {
+	id := c.Query("id")
+	db := DB.GetDB()
+	var app model.App
+	err := db.Where(&model.App{AppID: id}).First(&app).Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			c.JSON(util.MakeResp(http.StatusNotFound, 0, "app none"))
+			return
+		}
+		log.Println(err)
+		c.JSON(util.MakeResp(http.StatusInternalServerError, 0, "unknown error"))
+		return
+	}
+	c.JSON(util.MakeOkResp(app))
+}
+
 func RestGetAll(c *gin.Context) {
 	db := DB.GetDB()
 	var apps []*model.App
