@@ -7,41 +7,19 @@ import (
 )
 
 type Creator interface {
-	Create() (model.App, error)
-}
-
-type K8sCreator struct {
-	*model.Resource
-	Config string
-	UserID string
-}
-
-func (c K8sCreator) Create() (a model.App, err error) {
-	log.Println("create k8s app")
-	a = model.App{
-		ResourceID: c.ResourceID,
-		Name:       c.Name,
-		Config:     c.Config,
-		UserID:     c.UserID,
-	}
-	db := DB.GetDB()
-	err = db.Create(&a).Error
-	return
+	// 创建应用，不干涉数据库
+	Create(app *model.App) error
 }
 
 type HelmCreator struct {
 	*model.Resource
-	Config string
-	UserID string
 }
 
-func (c HelmCreator) Create() (a model.App, err error) {
+func (c HelmCreator) Create(a *model.App) (err error) {
 	log.Println("create helm app")
-	a = model.App{
+	a = &model.App{
 		ResourceID: c.ResourceID,
 		Name:       c.Name,
-		Config:     c.Config,
-		UserID:     c.UserID,
 	}
 	db := DB.GetDB()
 	err = db.Create(&a).Error

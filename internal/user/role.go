@@ -18,9 +18,11 @@ func RestAddAdmin(c *gin.Context) {
 	e := casbin.GetEnforcer()
 	if !isExist(id) {
 		c.JSON(util.MakeResp(http.StatusNotFound, 0, "user none"))
+		return
 	}
 	if !e.AddAdmin(id) {
 		c.JSON(util.MakeResp(http.StatusInternalServerError, 0, "add admin role error"))
+		return
 	}
 	c.JSON(util.MakeOkResp("success"))
 }
@@ -34,9 +36,11 @@ func RestDeleteAdmin(c *gin.Context) {
 	e := casbin.GetEnforcer()
 	if !isExist(id) {
 		c.JSON(util.MakeResp(http.StatusNotFound, 0, "user none"))
+		return
 	}
 	if !e.DeleteAdmin(id) {
 		c.JSON(util.MakeResp(http.StatusInternalServerError, 0, "delete admin role error"))
+		return
 	}
 	c.JSON(util.MakeOkResp("success"))
 }
@@ -51,8 +55,8 @@ func RestGetAdmin(c *gin.Context) {
 		db.Where(&model.User{ID: id}).First(user)
 		if user != nil {
 			user.Pass = ""
+			users = append(users, user)
 		}
-		users = append(users, user)
 	}
 	c.JSON(util.MakeOkResp(users))
 }

@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"kloud/model"
 	"kloud/pkg/DB"
+	"kloud/pkg/k8s"
 	"kloud/pkg/util"
 	"net/http"
 )
@@ -31,13 +32,17 @@ func RestCreatePortMapping(c *gin.Context) {
 		c.JSON(util.MakeResp(http.StatusBadRequest, 1, err.Error()))
 		return
 	}
-	ports := &model.PortMapping{
+	port := &model.PortMapping{
 		Port:       req.Port,
 		TargetPort: req.TargetPort,
 		AppID:      id,
 	}
-
-	err := db.Create(&ports).Error
+	err := k8s.ForwardPort("pod", port.AppID, port.Port, port.TargetPort)
+	if err != nil {
+		c.JSON(util.MakeResp(http.StatusBadRequest, 1, err.Error()))
+		return
+	}
+	err = db.Create(&port).Error
 	if err != nil {
 		c.JSON(util.MakeResp(http.StatusInternalServerError, 1, err.Error()))
 		return

@@ -1,8 +1,10 @@
 package resource
 
 import (
+	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
+	"io/ioutil"
 	"kloud/model"
 	"kloud/pkg/DB"
 	"kloud/pkg/util"
@@ -36,15 +38,24 @@ func RestGet(c *gin.Context) {
 		c.JSON(util.MakeResp(http.StatusInternalServerError, 0, "unknown error"))
 		return
 	}
+	config := make(map[string]any)
+	var data []byte
+	if data, err = ioutil.ReadFile(r.GetConfigFilename()); err != nil {
+		log.Println(err)
+		c.JSON(util.MakeResp(http.StatusInternalServerError, 0, "unknown error"))
+		return
+	}
+	err = json.Unmarshal(data, &config)
+	if err != nil {
+		log.Println(err)
+		c.JSON(util.MakeResp(http.StatusInternalServerError, 0, "unknown error"))
+		return
+	}
 	c.JSON(util.MakeOkResp(struct {
 		model.Resource
-		Config interface{} `json:"config"`
+		Config map[string]any `json:"config"`
 	}{
 		*r,
-		gin.H{
-			"name":   "demo",
-			"cpu":    "20",
-			"memory": "10",
-		},
+		config,
 	}))
 }

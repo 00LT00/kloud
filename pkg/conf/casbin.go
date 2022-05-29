@@ -3,9 +3,9 @@ package conf
 import "path"
 
 type casbinConf struct {
-	ModelFile string `toml:"model"`
+	ModelFilePath string `toml:"model"`
 }
 
 func (c casbinConf) Model() string {
-	return path.Join(Pwd, c.ModelFile)
+	return path.Join(Pwd, c.ModelFilePath)
 }

@@ -7,6 +7,7 @@ import (
 	"kloud/internal/app"
 	"kloud/model"
 	"kloud/pkg/DB"
+	"kloud/pkg/k8s"
 	"kloud/pkg/util"
 	"log"
 	"net/http"
@@ -65,11 +66,18 @@ func approve(f *model.Flow) error {
 	var c app.Creator
 	switch r.Type {
 	case model.K8s:
-		c = &app.K8sCreator{Resource: r, Config: f.Config, UserID: f.ApplicantID}
+		c = k8s.NewCreator(r)
 	case model.Helm:
-		c = &app.HelmCreator{Resource: r, Config: f.Config, UserID: f.ApplicantID}
+		//fixme 修改为helm
+		c = &app.HelmCreator{Resource: r}
 	}
-	a, err := c.Create()
+	a := &model.App{
+		UserID:     f.ApplicantID,
+		ResourceID: f.ResourceID,
+		Name:       f.AppName,
+		Config:     f.Config,
+	}
+	err := c.Create(a)
 	if err != nil {
 		f.Statue = model.Fail
 		f.Reason = fmt.Sprintf("create error, reason:%s", err.Error())

@@ -2,6 +2,7 @@ package model
 
 import (
 	"github.com/gofrs/uuid"
+	"gorm.io/datatypes"
 	"gorm.io/gorm"
 	"time"
 )
@@ -24,8 +25,10 @@ type Flow struct {
 	ApproverID string
 	//申请的App的ID
 	AppID string
+	//申请的App的名称
+	AppName string
 	// 配置
-	Config string
+	Config datatypes.JSONMap `gorm:"type:json"`
 	// 原因
 	Reason string
 	// 创建时间

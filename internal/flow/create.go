@@ -1,7 +1,9 @@
 package flow
 
 import (
+	"errors"
 	"github.com/gin-gonic/gin"
+	"gorm.io/datatypes"
 	"kloud/model"
 	"kloud/pkg/DB"
 	"kloud/pkg/util"
@@ -11,8 +13,9 @@ import (
 
 func RestCreate(c *gin.Context) {
 	type req struct {
-		ResourceID string `json:"resource_id"`
-		Config     string `json:"config"`
+		ResourceID string            `json:"resource_id"`
+		Name       string            `json:"name"`
+		Config     datatypes.JSONMap `json:"config"`
 	}
 	r := new(req)
 	err := c.ShouldBindJSON(r)
@@ -23,9 +26,13 @@ func RestCreate(c *gin.Context) {
 		c.JSON(util.MakeResp(http.StatusBadRequest, 0, "resource_id null"))
 		return
 	}
+	if r.Name == "" {
+		c.JSON(util.MakeResp(http.StatusBadRequest, 0, "name null"))
+		return
+	}
 	v, _ := c.Get("user")
 	u := v.(model.User)
-	err = createFlow(u.ID, r.ResourceID, r.Config)
+	err = createFlow(u.ID, r.Name, r.ResourceID, r.Config)
 	if err != nil {
 		c.JSON(util.MakeResp(http.StatusBadRequest, 1, err.Error()))
 		return
@@ -33,13 +40,26 @@ func RestCreate(c *gin.Context) {
 	c.JSON(util.MakeOkResp("create flow success"))
 }
 
-func createFlow(applicantID, resourceID, config string) error {
-	f := new(model.Flow)
-	f.ResourceID = resourceID
-	f.ApplicantID = applicantID
-	f.Config = config
+func createFlow(applicantID, appName, resourceID string, config datatypes.JSONMap) error {
 	db := DB.GetDB()
-	err := db.Create(f).Error
+	r := new(model.Resource)
+	r.ResourceID = resourceID
+	err := db.Where(r).First(r).Error
+	if err != nil {
+		return err
+	}
+	var cnt int64
+	db.Model(&model.App{}).Where(&model.App{ResourceID: resourceID}).Count(&cnt)
+	if cnt >= int64(r.MaxNum) {
+		return errors.New("out of max num")
+	}
+	f := &model.Flow{
+		ResourceID:  resourceID,
+		AppName:     appName,
+		ApplicantID: applicantID,
+		Config:      config,
+	}
+	err = db.Create(f).Error
 	if err != nil {
 		log.Println(err.Error())
 	}

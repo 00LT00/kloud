@@ -29,3 +29,11 @@ func (r *Resource) BeforeCreate(_ *gorm.DB) (err error) {
 	r.ResourceID = v4.String()
 	return
 }
+
+func (r *Resource) GetTemplateFilename() string {
+	return r.ResourceID + "template.yaml"
+}
+
+func (r *Resource) GetConfigFilename() string {
+	return r.ResourceID + "config.json"
+}
