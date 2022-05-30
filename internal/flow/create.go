@@ -49,8 +49,10 @@ func createFlow(applicantID, appName, resourceID string, config datatypes.JSONMa
 		return err
 	}
 	var cnt int64
-	db.Model(&model.App{}).Where(&model.App{ResourceID: resourceID}).Count(&cnt)
-	if cnt >= int64(r.MaxNum) {
+	db.Model(&model.App{}).Where(&model.App{ResourceID: resourceID, UserID: applicantID}).Count(&cnt)
+	sum := cnt
+	db.Model(&model.Flow{}).Where(&model.Flow{ResourceID: resourceID, ApplicantID: applicantID, Statue: model.Pending}).Count(&cnt)
+	if sum >= int64(r.MaxNum) {
 		return errors.New("out of max num")
 	}
 	f := &model.Flow{

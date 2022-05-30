@@ -71,9 +71,11 @@ func initRouter() {
 		a.GET("/user", app.RestGetByUser)
 		// 查看app详情
 		a.GET("/:id", app.RestGet)
+		a.DELETE("/:id", app.RestDelete)
 		p := a.Group("/:id/port")
 		p.PUT("", port.RestCreatePortMapping)
 		p.GET("", port.RestGetPortMapping)
+		p.DELETE("/:port", port.RestDeletePortMapping)
 	}
 
 }

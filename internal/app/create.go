@@ -7,7 +7,6 @@ import (
 )
 
 type Creator interface {
-	// 创建应用，不干涉数据库
 	Create(app *model.App) error
 }
 

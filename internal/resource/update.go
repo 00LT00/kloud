@@ -19,8 +19,8 @@ func RestUpdate(c *gin.Context) {
 		c.JSON(util.MakeResp(http.StatusBadRequest, 1, err.Error()))
 		return
 	}
-	if r.Name == "" || r.Folder == "" {
-		c.JSON(util.MakeResp(http.StatusBadRequest, 0, "name or folder null"))
+	if r.Name == "" || r.Folder == "" || r.MaxNum == 0 || (r.Type != model.K8s && r.Type != model.Helm) {
+		c.JSON(util.MakeResp(http.StatusBadRequest, 0, "name or folder or max_num or type null"))
 		return
 	}
 	r.ResourceID = id

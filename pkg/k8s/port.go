@@ -52,12 +52,12 @@ func ForwardPort(resource, name string, port, target int) error {
 	return nil
 }
 
-func StopPort(port int) error {
+func StopPort(port int) {
 	if _, ok := portmap[port]; !ok {
-		return errors.New("port not found")
+		return
 	}
 	portmap[port] <- struct{}{}
 	close(portmap[port])
 	delete(portmap, port)
-	return nil
+	return
 }

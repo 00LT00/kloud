@@ -18,8 +18,8 @@ func RestCreate(c *gin.Context) {
 		c.JSON(util.MakeResp(http.StatusBadRequest, 1, err.Error()))
 		return
 	}
-	if r.Name == "" || r.Folder == "" || (r.Type != model.K8s && r.Type != model.Helm) {
-		c.JSON(util.MakeResp(http.StatusBadRequest, 0, "name or folder null or type error"))
+	if r.Name == "" || r.Folder == "" || r.MaxNum == 0 || (r.Type != model.K8s && r.Type != model.Helm) {
+		c.JSON(util.MakeResp(http.StatusBadRequest, 0, "name or folder or max_num or type null"))
 		return
 	}
 	err = createResource(r)
@@ -38,6 +38,10 @@ func createResource(r *model.Resource) error {
 	if !ok {
 		return errors.New("folder not exist")
 	}
+	if ok, _ = util.PathExists(r.GetConfigFilename(), r.GetTemplateFilename()); !ok {
+		return errors.New("config or template not exist")
+	}
+
 	db := DB.GetDB()
 	err := db.Create(r).Error
 	if err != nil {

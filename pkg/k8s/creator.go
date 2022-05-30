@@ -9,6 +9,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/yaml"
 	"kloud/model"
+	"kloud/pkg/DB"
 	"kloud/pkg/conf"
 	"log"
 	"path"
@@ -49,6 +50,7 @@ func (c Creator) Create(a *model.App) (err error) {
 		return
 	}
 	a.AppID = id
+	err = DB.GetDB().Create(a).Error
 	return
 }
 
