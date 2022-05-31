@@ -41,12 +41,12 @@ func deleteApp(id string) (err error) {
 		return
 	}
 	tx := db.Begin()
-	err = tx.Delete(&model.App{AppID: id}).Error
+	err = tx.Where(&model.PortMapping{AppID: id}).Delete(&model.PortMapping{}).Error
 	if err != nil {
 		tx.Rollback()
 		return err
 	}
-	err = tx.Delete(&model.PortMapping{AppID: id}).Error
+	err = tx.Where(&model.App{AppID: id}).Delete(&model.App{}).Error
 	if err != nil {
 		tx.Rollback()
 		return err
