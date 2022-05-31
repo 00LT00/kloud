@@ -54,6 +54,11 @@ func deleteApp(id string) (err error) {
 	for _, port := range ports {
 		k8s.StopPort(port)
 	}
+	err = k8s.DeleteApp(id)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
 	tx.Commit()
 	return
 }
